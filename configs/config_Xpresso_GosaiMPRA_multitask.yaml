@@ -10,28 +10,49 @@ scheduler_interval: step
 
 DDP: True
 load_saved_model: False
-random_data_split: True
-train_valid_test_ratio: [0.8, 0.2, 0.0]
+random_data_split: False
+# train_valid_test_ratio: [0.8, 0.2, 0.0]
 
 train_dataset_1:
     type: XpressoDataset
     args:
         bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/Xpresso/merged_bed_exp.csv'
         genome_path: '/home/hxcai/genome/hg38.fa'
-        output_column: 'E123'
-        # filter_column: 'chr'
-        # filter_not_in_list: ['chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chrnan']
-        select_region: [9000, 11000]
+        output_column: 'K562'
+        filter_column: 'chr'
+        filter_not_in_list: ['chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chrnan']
+        select_seq_region: [9500, 10500]
 
 valid_dataset_1:
     type: XpressoDataset
     args:
         bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/Xpresso/merged_bed_exp.csv'
         genome_path: '/home/hxcai/genome/hg38.fa'
-        output_column: 'E123'
-        # filter_column: 'chr'
-        # filter_in_list: ['chr20', 'chr21', 'chr22']
-        select_region: [9000, 11000]
+        output_column: 'K562'
+        filter_column: 'chr'
+        filter_in_list: ['chr20', 'chr21', 'chr22']
+        select_seq_region: [9500, 10500]
+
+train_dataset_2:
+    type: SeqLabelDataset
+    args:
+        seq_exp_path: '../data/GosaiMPRA/GosaiMPRA_len200_10000.csv'
+        input_column: 'seq'
+        output_column: 'K562'
+        seq_pad_len: 1000
+        filter_column: 'chr'
+        filter_not_in_list: ['chr20', 'chr21', 'chr22', 'chrX', 'chrY', 'chrnan']
+
+valid_dataset_2:
+    type: SeqLabelDataset
+    args:
+        seq_exp_path: '../data/GosaiMPRA/GosaiMPRA_len200_10000.csv'
+        input_column: 'seq'
+        output_column: 'K562'
+        seq_pad_len: 1000
+        filter_column: 'chr'
+        filter_in_list: ['chr20', 'chr21', 'chr22']
+
 
 data_loader:
     type: DataLoader
@@ -41,31 +62,24 @@ data_loader:
         pin_memory: True
 
 model:
-    type: Xpresso
+    type: MultitaskBasset
     args:
-        input_length: 2000
-        output_dim: 1
-
-# model:
-#     type: MyBassetN
-#     args:
-#         input_length: 1000
-#         output_dim: 1
-#         conv_channels_list: [200,200,200,200,200,200,200,200,200,200,200,200,200,200,200]
-#         conv_kernel_size_list: [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
-#         pool_kernel_size_list: [1,1,1,1,4,1,1,1,1,4,1,1,1,1,4]
-#         linear_channels_list: [1000,1000]
-#         conv_dropout_rate: 0.1
-#         linear_dropout_rate: 0.5
-#         gap_layer: False
-#         # augmentation_region: [15, -15]
-#         sigmoid: True
-
+        input_length: 1000
+        output_dim: 2
+        conv_channels_list: [100,100,100,100,100,100,100,100,100,100,100,100]
+        conv_kernel_size_list: [3,3,3,3,3,3,3,3,3,3,3,3]
+        pool_kernel_size_list: [1,1,1,4,1,1,1,4,1,1,1,4]
+        linear_channels_list: [1000,100]
+        conv_dropout_rate: 0.1
+        linear_dropout_rate: 0.5
+        gap_layer: True
+        augmentation: False
+        augmentation_region: [0, 0]
 
 optimizer:
     type: Adam
     args:
-        lr: 1.0e-4
+        lr: 3.0e-4
         weight_decay: 1.0e-4
 
 lr_scheduler:
@@ -76,9 +90,9 @@ lr_scheduler:
 loss_func:
     type: MSELoss
 
-metric_func_list: [
-    {type: Pearson}
-    ]
+metric_func_list:
+    - type: Pearson
+    - type: Spearman
 
 logger:
     version: 1
