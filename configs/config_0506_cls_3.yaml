@@ -15,8 +15,8 @@ load_saved_model: false
 random_data_split: false
 
 task_names: ['ATAC_HepG2', 'ATAC_K562', 'MPRA_HepG2', 'MPRA_K562']
-selected_train_datasets_idx: [2,3]
-selected_valid_datasets_idx: [2,3]
+selected_train_datasets_idx: [3]
+selected_valid_datasets_idx: [3]
 
 train_datasets:
     -   type: BedDataset
@@ -59,7 +59,7 @@ train_datasets:
 
     -   type: SeqLabelDataset
         args: &train_dataset2_args
-            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_balanced_subset_68k.csv'
+            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_subset_exp>1_balanced_160k.csv'
             input_column: 'seq'
             seq_pad_len: 200
 
@@ -67,12 +67,12 @@ train_datasets:
             filter_in_list: null
             filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
 
-            output_column: 'HepG2_b'
+            output_column: 'HepG2'
             task_idx: [2, 0, 1]
 
     -   type: SeqLabelDataset
         args: &train_dataset3_args
-            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_balanced_subset_68k.csv'
+            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_subset_exp>1_balanced_160k.csv'
             input_column: 'seq'
             seq_pad_len: 200
 
@@ -80,7 +80,7 @@ train_datasets:
             filter_in_list: null
             filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
             
-            output_column: 'K562_b'
+            output_column: 'K562'
             task_idx: [3, 1, 1]
 
 
@@ -140,7 +140,22 @@ model:
                 pool_kernel_size_list:  [4,5,1]
                 pool_padding_list:      [0,0,0]
                 conv_dropout_rate:      0.2
-        
+
+                # conv_channels_list:     [512,512,512,512,512,512]
+                # conv_kernel_size_list:  [3,5,3,5,3,5]
+                # conv_padding_list:      [1,2,1,2,1,2]
+                # pool_kernel_size_list:  [1,4,1,5,1,1]
+                # pool_padding_list:      [0,0,0,0,0,0]
+                # conv_dropout_rate:      0.2
+
+
+                # conv_channels_list:     [256,256,256,256,256]
+                # conv_kernel_size_list:  [7,7,7,7,7]
+                # conv_padding_list:      [3,3,3,3,3]
+                # pool_kernel_size_list:  [2,2,2,2,2]
+                # pool_padding_list:      [0,0,0,1,1]
+                # conv_dropout_rate:      0.2
+
         processor_kwargs:
             type: MyBassetDecoder
             args:
@@ -172,14 +187,14 @@ data_loader:
     type: DataLoader
     args:
         batch_size: *batch_size
-        num_workers: 1
+        num_workers: 4
         pin_memory: true
         drop_last: false
 
 optimizer:
     type: Adam
     args:
-        lr: 1.0e-5
+        lr: 3.0e-5
         weight_decay: 1.0e-4
 
 lr_scheduler:
@@ -202,9 +217,10 @@ metric_func_list:
 early_stopper:
     type: EarlyStopping
     args:
+        monitor: 'AUROC'
         patience: 20
         delta: 0
-        target: 'min'
+        mode: 'max'
         verbose: true
 
 logger:

@@ -9,79 +9,75 @@ num_valid_epochs: 1 #每多少个epoch运行valid
 # num_save_epochs: 10
 # save_model: true
 scheduler_interval: step
-batch_size: &batch_size 1024
+batch_size: &batch_size 4096
 
 load_saved_model: false
 random_data_split: false
 
-task_names: ['ATAC_HepG2', 'ATAC_K562', 'MPRA_HepG2', 'MPRA_K562']
-selected_train_datasets_idx: [2,3]
-selected_valid_datasets_idx: [2,3]
+task_names: ['ATAC_HepG2', 'ATAC_K562', 'GosaiMPRA_HepG2', 'GosaiMPRA_K562']
+selected_train_datasets_idx: [0,1,2]
+selected_valid_datasets_idx: [0,1,2,3]
 
 train_datasets:
     -   type: BedDataset
         args: &train_dataset0_args
-            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/windows_balanced_subset_160k.csv'
+            task_idx: [0, 0, 0]
+            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/ATAC_subset_balanced_160k.csv'
             genome_path: '/home/hxcai/genome/hg38.fa'
+            output_column: 'HepG2_b'
             use_strand: false
-            use_mid: false
+            use_pos: false
             seq_pad_len: 200
 
             rc_aug: true
             shift_aug: true
-            shift_aug_range: [-20, 20]
+            shift_aug_range: [-50, 50]
             filter_column: 'chr'
             filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
-
-            output_column: 'HepG2_b'
-            task_idx: [0, 0, 0]
-
+            filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
 
     -   type: BedDataset
         args: &train_dataset1_args
-            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/windows_balanced_subset_160k.csv'
+            task_idx: [1, 1, 0]
+            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/ATAC_subset_balanced_160k.csv'
             genome_path: '/home/hxcai/genome/hg38.fa'
+            output_column: 'K562_b'
             use_strand: false
-            use_mid: false
+            use_pos: false
             seq_pad_len: 200
 
             rc_aug: true
             shift_aug: true
-            shift_aug_range: [-20, 20]
+            shift_aug_range: [-50, 50]
             filter_column: 'chr'
             filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
-
-            output_column: 'K562_b'
-            task_idx: [1, 1, 0]
-
+            filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
 
     -   type: SeqLabelDataset
         args: &train_dataset2_args
-            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_balanced_subset_68k.csv'
-            input_column: 'seq'
-            seq_pad_len: 200
-
-            filter_column: 'chr'
-            filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
-
-            output_column: 'HepG2_b'
             task_idx: [2, 0, 1]
+            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_designed.csv'
+            input_column: 'seq'
+            output_column: 'HepG2_b'
+
+            # filter_column: 'chr'
+            # filter_in_list: null
+            # filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
+            shuffle: true
+            subset_range: [0, 0.8]
 
     -   type: SeqLabelDataset
         args: &train_dataset3_args
-            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_balanced_subset_68k.csv'
-            input_column: 'seq'
-            seq_pad_len: 200
-
-            filter_column: 'chr'
-            filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
-            
-            output_column: 'K562_b'
             task_idx: [3, 1, 1]
+            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_designed.csv'
+            input_column: 'seq'
+            output_column: 'K562_b'
+
+            # filter_column: 'chr'
+            # filter_in_list: null
+            # filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
+            shuffle: true
+            subset_range: [0, 0.8]
 
 
 
@@ -89,42 +85,38 @@ valid_datasets:
     -   type: BedDataset
         args:
             <<: *train_dataset0_args
-
             rc_aug: false
             shift_aug: false
             filter_in_list: ['chr1']
             filter_not_in_list: null
-
 
     -   type: BedDataset
         args:
             <<: *train_dataset1_args
-
             rc_aug: false
             shift_aug: false
             filter_in_list: ['chr1']
             filter_not_in_list: null
 
-
     -   type: SeqLabelDataset
         args:
             <<: *train_dataset2_args
-
-            filter_in_list: ['chr1']
-            filter_not_in_list: null
+            # filter_in_list: ['chr1']
+            # filter_not_in_list: null
+            subset_range: [0.8, 1]
 
 
     -   type: SeqLabelDataset
         args:
             <<: *train_dataset3_args
-
-            filter_in_list: ['chr1']
-            filter_not_in_list: null
+            # filter_in_list: ['chr1']
+            # filter_not_in_list: null
+            subset_range: [0.8, 1]
 
 
 
 model:
-    type: MyBassetMultiEncoderMultiDecoder
+    type: MyBassetSequential
     args:
         input_length:   200
         output_dim: 1
@@ -132,34 +124,55 @@ model:
         n_tasks:    2
 
         encoder_kwargs:
-            type: MyBassetEncoder
+        -   type: MyBassetEncoder
             args:
-                conv_channels_list:     [256,256,256]
-                conv_kernel_size_list:  [7,7,7]
-                conv_padding_list:      [3,3,3]
-                pool_kernel_size_list:  [4,5,1]
-                pool_padding_list:      [0,0,0]
+                conv_channels_list:     [256,256,256,256]
+                conv_kernel_size_list:  [7,7,7,7]
+                conv_padding_list:      [0,0,0,0]
+                pool_kernel_size_list:  [2,2,2,2]
                 conv_dropout_rate:      0.2
-        
-        processor_kwargs:
-            type: MyBassetDecoder
+                
+        shared_decoder_kwargs:
+        -   type: MyBassetDecoder
             args:
                 linear_channels_list:   [256,256]
                 linear_dropout_rate:    0.5
-                last_linear_layer:            false
+                last_linear_layer:      false
                 sigmoid:                false
-    
-        decoder_kwargs:
-            type: MyBassetDecoder
+
+        cell_decoder_kwargs:
+        -   type: MyBassetDecoder
             args:
-                linear_channels_list:   []
+                input_dim:              256
+                linear_channels_list:   [256,256]
                 linear_dropout_rate:    0.5
-                last_linear_layer:            true
+                last_linear_layer:      false
+                sigmoid:                false
+        -   type: MyBassetDecoder
+            args:
+                input_dim:              256
+                linear_channels_list:   [256,256]
+                linear_dropout_rate:    0.5
+                last_linear_layer:      false
+                sigmoid:                false
+                
+        task_decoder_kwargs:
+        -   type: MyBassetDecoder
+            args:
+                input_dim:              256
+                output_dim:             1
+                linear_channels_list:   [256,256]
+                linear_dropout_rate:    0.5
+                last_linear_layer:      true
                 sigmoid:                true
-
-        # augmentation:           false
-        # augmentation_region:    null
-
+        -   type: MyBassetDecoder
+            args:
+                input_dim:              256
+                output_dim:             1
+                linear_channels_list:   [256,256]
+                linear_dropout_rate:    0.5
+                last_linear_layer:      true
+                sigmoid:                true
 
 
 multi_task_data_loader:
@@ -172,14 +185,14 @@ data_loader:
     type: DataLoader
     args:
         batch_size: *batch_size
-        num_workers: 1
+        num_workers: 8
         pin_memory: true
         drop_last: false
 
 optimizer:
     type: Adam
     args:
-        lr: 1.0e-5
+        lr: 3.0e-4
         weight_decay: 1.0e-4
 
 lr_scheduler:
@@ -187,25 +200,35 @@ lr_scheduler:
     args: 
         T_0: 20
 
+
 loss_func:
     type: MultiTaskLoss
     args:
         loss_list: 
         - 'BCELoss'
         - 'BCELoss'
+        
+# loss_funcs:
+# - type: MyBCELoss
+# - type: MyBCELoss
 
-metric_func_list:
+metric_funcs:
+# - type: Pearson
+# - type: Spearman
 - type: Accuracy
 - type: AUROC
 - type: AUPRC
 
-early_stopper:
-    type: EarlyStopping
-    args:
-        patience: 20
-        delta: 0
-        target: 'min'
-        verbose: true
+
+# early_stopper:
+#     type: EarlyStopping
+#     args:
+#         monitor: 'Pearson'
+#         patience: 20
+#         delta: 0
+#         mode: 'max'
+#         verbose: true
+
 
 logger:
     version: 1

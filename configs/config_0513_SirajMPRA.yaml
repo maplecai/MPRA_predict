@@ -9,30 +9,30 @@ num_valid_epochs: 1 #每多少个epoch运行valid
 # num_save_epochs: 10
 # save_model: true
 scheduler_interval: step
-batch_size: &batch_size 1024
+batch_size: &batch_size 4096
 
 load_saved_model: false
 random_data_split: false
 
 task_names: ['ATAC_HepG2', 'ATAC_K562', 'MPRA_HepG2', 'MPRA_K562']
-selected_train_datasets_idx: [2,3]
-selected_valid_datasets_idx: [2,3]
+selected_train_datasets_idx: [3]
+selected_valid_datasets_idx: [3]
 
 train_datasets:
     -   type: BedDataset
         args: &train_dataset0_args
-            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/windows_balanced_subset_160k.csv'
+            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/ATAC_subset_balanced_400k.csv'
             genome_path: '/home/hxcai/genome/hg38.fa'
             use_strand: false
             use_mid: false
-            seq_pad_len: 200
+            seq_pad_len: 1000
 
             rc_aug: true
             shift_aug: true
-            shift_aug_range: [-20, 20]
+            shift_aug_range: [-100, 100]
             filter_column: 'chr'
             filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
+            filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
 
             output_column: 'HepG2_b'
             task_idx: [0, 0, 0]
@@ -40,18 +40,18 @@ train_datasets:
 
     -   type: BedDataset
         args: &train_dataset1_args
-            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/windows_balanced_subset_160k.csv'
+            bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/ATAC_subset_balanced_400k.csv'
             genome_path: '/home/hxcai/genome/hg38.fa'
             use_strand: false
             use_mid: false
-            seq_pad_len: 200
+            seq_pad_len: 1000
 
             rc_aug: true
             shift_aug: true
             shift_aug_range: [-20, 20]
             filter_column: 'chr'
             filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
+            filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
 
             output_column: 'K562_b'
             task_idx: [1, 1, 0]
@@ -59,28 +59,28 @@ train_datasets:
 
     -   type: SeqLabelDataset
         args: &train_dataset2_args
-            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_balanced_subset_68k.csv'
+            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/SirajMPRA/SirajMPRA_len200_genome_3celltypes_hg19.csv'
             input_column: 'seq'
-            seq_pad_len: 200
+            # seq_pad_len: 200
 
             filter_column: 'chr'
             filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
+            filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
 
-            output_column: 'HepG2_b'
+            output_column: 'allele1.log2FC_HEPG2'
             task_idx: [2, 0, 1]
 
     -   type: SeqLabelDataset
         args: &train_dataset3_args
-            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_balanced_subset_68k.csv'
+            seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/SirajMPRA/SirajMPRA_len200_genome_3celltypes_hg19.csv'
             input_column: 'seq'
-            seq_pad_len: 200
+            # seq_pad_len: 200
 
             filter_column: 'chr'
             filter_in_list: null
-            filter_not_in_list: ['chr1', 'chrX', 'chrY', 'chrnan']
+            filter_not_in_list: ['chr1', 'chr2', 'chrX', 'chrY', 'chrnan']
             
-            output_column: 'K562_b'
+            output_column: 'allele1.log2FC_K562'
             task_idx: [3, 1, 1]
 
 
@@ -134,28 +134,25 @@ model:
         encoder_kwargs:
             type: MyBassetEncoder
             args:
-                conv_channels_list:     [256,256,256]
-                conv_kernel_size_list:  [7,7,7]
-                conv_padding_list:      [3,3,3]
-                pool_kernel_size_list:  [4,5,1]
-                pool_padding_list:      [0,0,0]
+                conv_channels_list:     [256,256,256,256,256]
+                conv_kernel_size_list:  [7,7,7,7,7]
+                conv_padding_list:      [3,3,3,3,3]
+                pool_kernel_size_list:  [2,2,2,2,2]
+                pool_padding_list:      [0,0,0,0,0]
                 conv_dropout_rate:      0.2
-        
+                gap_layer:              true
+
         processor_kwargs:
             type: MyBassetDecoder
             args:
                 linear_channels_list:   [256,256]
                 linear_dropout_rate:    0.5
-                last_linear_layer:            false
-                sigmoid:                false
     
         decoder_kwargs:
             type: MyBassetDecoder
             args:
-                linear_channels_list:   []
-                linear_dropout_rate:    0.5
                 last_linear_layer:            true
-                sigmoid:                true
+                sigmoid:                false
 
         # augmentation:           false
         # augmentation_region:    null
@@ -172,14 +169,14 @@ data_loader:
     type: DataLoader
     args:
         batch_size: *batch_size
-        num_workers: 1
+        num_workers: 8
         pin_memory: true
         drop_last: false
 
 optimizer:
     type: Adam
     args:
-        lr: 1.0e-5
+        lr: 4.0e-4
         weight_decay: 1.0e-4
 
 lr_scheduler:
@@ -191,20 +188,20 @@ loss_func:
     type: MultiTaskLoss
     args:
         loss_list: 
-        - 'BCELoss'
-        - 'BCELoss'
+        - 'MSELoss'
+        - 'MSELoss'
 
 metric_func_list:
-- type: Accuracy
-- type: AUROC
-- type: AUPRC
+- type: Pearson
+- type: Spearman
 
 early_stopper:
     type: EarlyStopping
     args:
+        monitor: 'Pearson'
         patience: 20
         delta: 0
-        target: 'min'
+        mode: 'max'
         verbose: true
 
 logger:

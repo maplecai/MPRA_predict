@@ -24,7 +24,7 @@ train_datasets:
             bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/windows_balanced_subset_160k.csv'
             genome_path: '/home/hxcai/genome/hg38.fa'
             use_strand: false
-            use_TSS: false
+            use_mid: false
             seq_pad_len: 200
 
             rc_aug: true
@@ -43,7 +43,7 @@ train_datasets:
             bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/ATAC/windows_balanced_subset_160k.csv'
             genome_path: '/home/hxcai/genome/hg38.fa'
             use_strand: false
-            use_TSS: false
+            use_mid: false
             seq_pad_len: 200
 
             rc_aug: true
@@ -146,7 +146,7 @@ model:
             args:
                 linear_channels_list:   [256,256]
                 linear_dropout_rate:    0.5
-                last_linear:            false
+                last_linear_layer:            false
                 sigmoid:                false
     
         decoder_kwargs:
@@ -154,7 +154,7 @@ model:
             args:
                 linear_channels_list:   []
                 linear_dropout_rate:    0.5
-                last_linear:            true
+                last_linear_layer:            true
                 sigmoid:                true
 
         # augmentation:           false

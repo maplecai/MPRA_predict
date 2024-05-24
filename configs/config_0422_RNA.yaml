@@ -21,8 +21,8 @@ selected_valid_datasets_idx: [1]
     bed_exp_path: '/home/hxcai/cell_type_specific_CRE/data/Xpresso/merged_bed_exp.csv'
     genome_path: '/home/hxcai/genome/hg38.fa'
     use_strand: True
-    use_TSS: True
-    TSS_range: [-500, 500]
+    use_mid: True
+    select_seq_range: [-500, 500]
     shift_aug: True
     shift_aug_range: [-500, 0]
 
