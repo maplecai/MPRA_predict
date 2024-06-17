@@ -17,7 +17,7 @@ train_dataset:
     args: &train_dataset_args
         seq_exp_path: '/home/hxcai/cell_type_specific_CRE/data/GosaiMPRA/GosaiMPRA_len200.csv'
         input_column: 'seq'
-        output_column: ['HepG2', 'K562', 'SKNSH']
+        output_column: ['HepG2']
         # shuffle: true
         # subset_range: [0, 0.8]
         # seq_pad_len: 200
@@ -46,7 +46,7 @@ model:
     type: MyBasset
     args:
         input_length:           200
-        output_dim:             3
+        output_dim:             1
         squeeze:                false
 
         conv_channels_list:     [256,256,256,256,256,256,256,256,256,256,256,256]
@@ -61,7 +61,7 @@ model:
         last_linear_layer:      true
         sigmoid:                false
 
-        rc_augmentation:        true
+        rc_augmentation:        false
         rc_region:              null
 
 
