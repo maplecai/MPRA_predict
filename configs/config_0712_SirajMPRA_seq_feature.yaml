@@ -7,7 +7,7 @@ num_valid_epochs: 1 #每多少个epoch运行valid
 # num_save_epochs: 10
 # save_model: true
 scheduler_interval: step
-batch_size: &batch_size 1024
+batch_size: &batch_size 2048
 
 load_saved_model: false
 random_data_split: false
@@ -71,8 +71,8 @@ model:
 data_loader:
     type: DataLoader
     args:
-        batch_size: *batch_size
-        num_workers: 0
+        batch_size: *batch_size 
+        num_workers: 1
         pin_memory: false
         drop_last: false
 
