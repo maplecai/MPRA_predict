@@ -3,22 +3,21 @@ distribute: False # 是否使用分布式训练
 gpu_ids: [0] # 训练使用的gpu id
 seed: 0 # 随机数种子
 save_dir: saved # 保存的根路径
-num_epochs: 400 # 训练的epoch总数
+num_epochs: 500 # 训练的epoch总数
 num_log_steps: 10 # 每多少个step输出log, 0 means no output
 num_valid_epochs: 1 # 每多少个epoch运行valid
 scheduler_interval: step
-global_batch_size: &global_batch_size 1024
+global_batch_size: &global_batch_size 4096
 load_saved_model: false
 
-train_cell_types: &train_cell_types ['HepG2', 'K562', 'A549', 'HCT116']
-valid_cell_types: *train_cell_types
+cell_types: &cell_types ['HepG2', 'K562', 'A549', 'HCT116']
 
 train_dataset:
     type: &type SeqLabelDataset
     args: &args
         data_path: '/home/hxcai/cell_type_specific_CRE/data/SirajMPRA/SirajMPRA_total.csv'
         seq_column: 'seq'
-        label_column: *train_cell_types
+        label_column: *cell_types
         apply_filter: true
         filter_column: 'chr'
         filter_in_list: ['chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22']
@@ -63,13 +62,11 @@ data_loader:
     args:
         batch_size: *global_batch_size
         num_workers: 1
-        pin_memory: false
-        drop_last: false
 
 optimizer:
     type: Adam
     args:
-        lr: 1.0e-4
+        lr: 1.0e-3
         weight_decay: 1.0e-4
 
 lr_scheduler:
@@ -98,7 +95,7 @@ early_stopper:
     type: EarlyStopping
     args:
         monitor: 'Pearson'
-        patience: 20
+        patience: 30
         delta: 0
         mode: 'max'
         verbose: true

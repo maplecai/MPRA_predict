@@ -1,9 +1,9 @@
 train: True # 是训练还是测试
 distribute: False # 是否使用分布式训练
-gpu_ids: [0] # 训练使用的gpu id
+gpu_ids: [2] # 训练使用的gpu id
 seed: 0 # 随机数种子
 save_dir: saved # 保存的根路径
-num_epochs: 1000 # 训练的epoch总数
+num_epochs: 500 # 训练的epoch总数
 num_log_steps: 10 # 每多少个step输出log, 0 means no output
 num_valid_epochs: 1 # 每多少个epoch运行valid
 scheduler_interval: step
@@ -13,13 +13,11 @@ load_saved_model: false
 cell_types: &cell_types ['HepG2', 'K562', 'A549', 'HCT116']
 
 train_dataset:
-    type: &type SeqFeatureLabelDataset
+    type: &type SeqLabelDataset
     args: &args
-        data_path: '/home/hxcai/cell_type_specific_CRE/MPRA_exp/pretrained_based_models/data/Sei_Siraj_features_concat.csv'
+        data_path: '/home/hxcai/cell_type_specific_CRE/data/SirajMPRA/SirajMPRA_total.csv'
         seq_column: 'seq'
-        feature_column: ['DNase', 'H3K4me1', 'H3K4me3', 'H3K9me3', 'H3K27me3', 'H3K27ac', 'H3K36me3', 'CTCF']
-        label_column: 'exp'
-        cell_types: *cell_types
+        label_column: *cell_types
         apply_filter: true
         filter_column: 'chr'
         filter_in_list: ['chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22']
@@ -28,38 +26,37 @@ valid_dataset:
     type: *type
     args:
         <<: *args
-        cell_types: *cell_types
         filter_in_list: ['chr1']
 
 test_dataset:
     type: *type
     args:
         <<: *args
-        cell_types: ['HepG2', 'K562', 'A549', 'HCT116']
         apply_filter: false
 
 model:
-    type: MyBassetFeature
+    type: MyBassetResidual
     args:
-        input_length:           200
-        input_feature_dim:      8
-        output_dim:             1
-        squeeze:                true
+        input_length:       200
+        output_dim:         4
+        residual:           False
+        sigmoid:            False
+        squeeze:            True
+        
+        conv_num:           16
+        conv_channels:      256
+        conv_kernel_size:   3
+        conv_stride:        1
+        conv_padding:       1
+        conv_dropout_rate:  0.2
 
-        conv_channels_list:     [256,256,256,256,256,256,256,256,256,256,256,256,256,256,256,256]
-        conv_kernel_size_list:  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
-        conv_padding_list:      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        pool_kernel_size_list:  [1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,2]
-        conv_dropout_rate:      0.2
-        gap_layer:              false
-
-        linear_channels_list:   [1024, 1024]
-        linear_dropout_rate:    0.5
-        last_linear_layer:      true
-        sigmoid:                false
-
-        rc_augmentation:        false
-        rc_region:              null
+        pool_interval:      4
+        pool_kernel_size:   2
+        pool_padding:       0
+        
+        linear_num:         2
+        linear_channels:    768
+        linear_dropout_rate: 0.5
 
 
 data_loader:

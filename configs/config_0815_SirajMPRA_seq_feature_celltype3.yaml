@@ -10,7 +10,7 @@ scheduler_interval: step
 global_batch_size: &global_batch_size 4096
 load_saved_model: false
 
-cell_types: &cell_types ['HepG2', 'K562', 'A549', 'HCT116']
+cell_types: &cell_types ['HepG2', 'K562', 'A549']
 
 train_dataset:
     type: &type SeqFeatureLabelDataset
