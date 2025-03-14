@@ -1,6 +1,6 @@
 distributed: false # 是否使用分布式训练
-gpu_ids: [1] # 可用的gpu id
-world_size: 2 # gpu数量
+gpu_ids: [0] # 可用的gpu id
+world_size: 1 # gpu数量
 
 seed: 0 # 随机数种子
 save_dir: saved # 保存的根路径
@@ -44,10 +44,10 @@ test_dataset:
     apply_filter: false
 
 model:
-  type: MyBassetFeature
+  type: MyBasset
   args:
     input_seq_length: 200
-    input_feature_dim: 4
+        # input_feature_dim:      4
         # num_cell_types:         *num_cell_types
     output_dim: 1
 
@@ -62,7 +62,7 @@ model:
     linear_dropout_rate: 0.5
 
     sigmoid: false
-    squeeze: true
+    squeeze: false
 
 optimizer:
   type: Adam

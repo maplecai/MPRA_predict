@@ -25,11 +25,11 @@ train_dataset:
     filter_in_list: [chr3, chr4, chr5, chr6, chr7, chr8, chr9, chr10, chr11, chr12,
       chr13, chr14, chr15, chr16, chr17, chr18, chr19, chr20, chr21, chr22]
     seq_column: seq
-        # feature_column: null
     label_column: [HepG2]
-        # matrixize_feature: false
-        # cell_types: *cell_types
-        # assays: *assays
+    # feature_column: null
+    # matrixize_feature: false
+    # cell_types: *cell_types
+    # assays: *assays
 
 valid_dataset:
   type: *type
@@ -47,9 +47,11 @@ model:
   type: MyBasset
   args:
     input_seq_length: 200
-        # input_feature_dim:      4
-        # num_cell_types:         *num_cell_types
+    # input_feature_dim:      4
+    # num_cell_types:         *num_cell_types
     output_dim: 1
+    sigmoid: false
+    squeeze: false
 
     conv_channels_list: [256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256,
       256, 256, 256, 256, 256, 256]
@@ -61,8 +63,7 @@ model:
     linear_channels_list: [1024, 1024]
     linear_dropout_rate: 0.5
 
-    sigmoid: false
-    squeeze: false
+
 
 optimizer:
   type: Adam

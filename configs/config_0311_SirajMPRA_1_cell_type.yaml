@@ -1,6 +1,6 @@
 distributed: false # 是否使用分布式训练
-gpu_ids: [1] # 可用的gpu id
-world_size: 2 # gpu数量
+gpu_ids: [0] # 可用的gpu id
+world_size: 1 # gpu数量
 
 seed: 0 # 随机数种子
 save_dir: saved # 保存的根路径
@@ -13,7 +13,7 @@ load_saved_model: false
 
 num_cell_types: &num_cell_types 1
 cell_types: &cell_types ['HepG2']
-assays: &assays ['DNase', 'H3K4me3', 'H3K27ac','CTCF']
+assays: &assays ['DNase', 'H3K4me3', 'H3K27ac', 'CTCF']
 
 train_dataset:
     type: &type SeqDataset
@@ -42,10 +42,10 @@ test_dataset:
         apply_filter: false
 
 model:
-    type: MyBassetFeature
+    type: MyBasset
     args:
         input_seq_length:       200
-        input_feature_dim:      4
+        # input_feature_dim:      4
         # num_cell_types:         *num_cell_types
         output_dim:             1
 
@@ -58,8 +58,8 @@ model:
         linear_channels_list:   [1024, 1024]
         linear_dropout_rate:    0.5
 
-        sigmoid:                False
-        squeeze:                True
+        sigmoid:                false
+        squeeze:                false
 
 optimizer:
     type: Adam

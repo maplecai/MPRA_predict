@@ -13,7 +13,7 @@ load_saved_model: false
 
 num_cell_types: &num_cell_types 1
 cell_types:
-- HepG2
+- A549
 assays: [DNase, H3K4me3, H3K27ac, CTCF]
 
 train_dataset:
