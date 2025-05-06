@@ -3,7 +3,7 @@
 # world_size: 2 # gpu数量
 
 distributed: false # 是否使用分布式训练
-gpu_ids: [2] # 可用的gpu id
+gpu_ids: [3] # 可用的gpu id
 
 seed: 0 # 随机数种子
 save_dir: saved # 保存的根路径
@@ -79,7 +79,7 @@ model:
     conv_dropout_rate:      0.2
     conv_padding:           same
     conv_activation:        relu
-    pool_kernel_size_list:  [2,2,2,2,2,2]
+    pool_kernel_size_list:  [2,2,2,2,2,1]
     gap:                    false
 
     num_trans_blocks:       6
@@ -100,7 +100,7 @@ optimizer:
     lr: 1.0e-3
     weight_decay: 1.0e-4
   transformer_args:
-    lr: 1.0e-4
+    lr: 3.0e-4
     weight_decay: 1.0e-4
 
 lr_scheduler:
