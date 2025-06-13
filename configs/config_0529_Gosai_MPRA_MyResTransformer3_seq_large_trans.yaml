@@ -3,7 +3,7 @@
 # world_size: 2 # gpu数量
 
 distributed: false # 是否使用分布式训练
-gpu_ids: [0] # 可用的gpu id
+gpu_ids: auto # 可用的gpu id
 
 seed: 0 # 随机数种子
 save_dir: saved # 保存的根路径
@@ -14,33 +14,44 @@ scheduler_interval: step
 batch_size: 4096
 load_saved_model: false
 
-cell_types: &cell_types [K562]
-assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
+cell_types: &cell_types [K562, HepG2, SK-N-SH]
+# assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
+
+template_dataset:
+  type: &type SeqDataset
+  args: &args
+    data_path: ./data/Gosai_MPRA/Gosai_MPRA_Sei_feature_0529.csv
+    seq_column: seq
+    label_column: *cell_types
+    # cell_types: *cell_types
+    # assays: *assays
+    apply_filter: false
 
 train_dataset:
-  type: &type SeqFeatureMatrixDataset
-  args: &args
-    data_path: ./data/Gosai_MPRA/Gosai_MPRA_with_epi_norm.csv
+  type: *type
+  args:
+    <<: *args
     apply_filter: true
     filter_column: chr
     filter_in_list: [chr3, chr4, chr5, chr6, chr7, chr8, chr9, chr10, chr11, chr12,
-      chr13, chr14, chr15, chr16, chr17, chr18, chr19, chr20, chr21, chr22, chrX, chrY]
-    seq_column: seq
-    label_column: *cell_types
-    cell_types: *cell_types
-    assays: *assays
+      chr13, chr14, chr15, chr16, chr17, chr18, chr19, chr20, chr21, chr22, chrX,
+      chrY]
 
 valid_dataset:
   type: *type
   args:
     <<: *args
+    apply_filter: true
+    filter_column: chr
     filter_in_list: [chr1]
 
 test_dataset:
   type: *type
   args:
     <<: *args
-    apply_filter: false
+    apply_filter: true
+    filter_column: chr
+    filter_in_list: [chr2]
 
 
 model:
@@ -49,8 +60,7 @@ model:
     input_seq_length:       200
     input_seq_channels:     4
     input_feature_dim:      0
-    input_feature_times:    0
-    output_dim:             1
+    output_dim:             3
     sigmoid:                false
     squeeze:                false
 
@@ -65,10 +75,10 @@ model:
     pool_kernel_size_list:  [2,2,2,2,2,2]
     gap:                    false
 
-    num_trans_blocks:       3
-    trans_d_embed:          256
+    num_trans_blocks:       6
+    trans_d_embed:          1024
     trans_n_heads:          4
-    trans_d_mlp:            256
+    trans_d_mlp:            1024
     trans_dropout_rate:     0.1
     trans_output:           seq_mean
 
@@ -83,7 +93,7 @@ optimizer:
     lr: 1.0e-3
     weight_decay: 1.0e-4
   transformer_args:
-    lr: 1.0e-4
+    lr: 3.0e-4
     weight_decay: 1.0e-4
 
 lr_scheduler:

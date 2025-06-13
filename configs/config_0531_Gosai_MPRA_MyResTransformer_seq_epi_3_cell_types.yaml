@@ -14,23 +14,17 @@ scheduler_interval: step
 batch_size: 4096
 load_saved_model: false
 
-cell_types: &cell_types [K562, HepG2, SK-N-SH, HCT116, A549]
+cell_types: &cell_types [K562, HepG2, SK-N-SH]
 assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
 
 template_dataset:
   type: &type SeqFeatureMatrixDataset
   args: &args
-    data_path: ./data/cCRE/cCRE_5_cell_types_Sei_feature_0512.csv
+    data_path: ./data/Gosai_MPRA/Gosai_MPRA_Sei_feature_0529.csv
     seq_column: seq
-    # label_column: *cell_types
+    label_column: *cell_types
     cell_types: *cell_types
     assays: *assays
-
-    crop: false
-    padding: true
-    padded_length: 600
-    padding_method: 'N'
-
     apply_filter: false
 
 train_dataset:
@@ -63,14 +57,16 @@ total_dataset:
   type: *type
   args:
     <<: *args
-
+    label_column: ['K562', 'HepG2', 'SK-N-SH', 'HCT116', 'A549']
+    cell_types: ['K562', 'HepG2', 'SK-N-SH', 'HCT116', 'A549']
 
 model:
   type: MyResTransformer
   args:
-    input_seq_length:       600
+    input_seq_length:       200
     input_seq_channels:     4
     input_feature_dim:      4
+    input_feature_times:    3
     output_dim:             1
     sigmoid:                false
     squeeze:                true
@@ -87,6 +83,15 @@ model:
     pool_kernel_size_list:  [2,2,2,2,2,2]
     gap:                    false
 
+    # fusion_type:            linear_concat
+    # fusion_x_transform:     true
+    # fusion_y_transform:     true
+    # fusion_x_input_dim:     1024
+    # fusion_y_input_dim:     4
+    # fusion_x_output_dim:    512
+    # fusion_y_output_dim:    512
+
+
     num_trans_blocks:       6
     trans_d_embed:          256
     trans_n_heads:          4
@@ -94,7 +99,7 @@ model:
     trans_dropout_rate:     0.1
     trans_output:           seq_mean
 
-    linear_channels_list:   [1024]
+    linear_channels_list:   [1024, 1024]
     linear_dropout_rate:    0.5
 
 

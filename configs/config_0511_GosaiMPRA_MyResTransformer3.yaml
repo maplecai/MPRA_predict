@@ -25,7 +25,6 @@ template_dataset:
     label_column: *cell_types
     cell_types: *cell_types
     assays: *assays
-
     apply_filter: false
 
 train_dataset:

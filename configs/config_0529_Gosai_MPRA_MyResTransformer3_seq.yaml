@@ -14,23 +14,17 @@ scheduler_interval: step
 batch_size: 4096
 load_saved_model: false
 
-cell_types: &cell_types [K562, HepG2, SK-N-SH, HCT116, A549]
-assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
+cell_types: &cell_types [K562, HepG2, SK-N-SH]
+# assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
 
 template_dataset:
-  type: &type SeqFeatureMatrixDataset
+  type: &type SeqDataset
   args: &args
-    data_path: ./data/cCRE/cCRE_5_cell_types_Sei_feature_0512.csv
+    data_path: ./data/Gosai_MPRA/Gosai_MPRA_Sei_feature_0529.csv
     seq_column: seq
-    # label_column: *cell_types
-    cell_types: *cell_types
-    assays: *assays
-
-    crop: false
-    padding: true
-    padded_length: 600
-    padding_method: 'N'
-
+    label_column: *cell_types
+    # cell_types: *cell_types
+    # assays: *assays
     apply_filter: false
 
 train_dataset:
@@ -64,16 +58,15 @@ total_dataset:
   args:
     <<: *args
 
-
 model:
   type: MyResTransformer
   args:
-    input_seq_length:       600
+    input_seq_length:       200
     input_seq_channels:     4
-    input_feature_dim:      4
-    output_dim:             1
+    input_feature_dim:      0
+    output_dim:             3
     sigmoid:                false
-    squeeze:                true
+    squeeze:                false
 
     conv_first_channels:    256
     conv_first_kernel_size: 7
