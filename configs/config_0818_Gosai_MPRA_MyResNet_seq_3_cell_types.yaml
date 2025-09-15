@@ -20,7 +20,7 @@ assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
 template_dataset:
   type: &type SeqFeatureMatrixDataset
   args: &args
-    data_path: ./data/Gosai_MPRA/Gosai_MPRA_Sei_feature_0529_norm.csv
+    data_path: ./data/Gosai_MPRA/Gosai_MPRA_Sei_feature_0529.csv
     seq_column: seq
     label_column: *cell_types
     cell_types: *cell_types
@@ -61,13 +61,13 @@ total_dataset:
     cell_types: ['K562', 'HepG2', 'SK-N-SH', 'HCT116', 'A549']
 
 model:
-  type: MyResTransformer
+  type: MyResNet
   args:
     input_seq_length:       200
     input_seq_channels:     4
-    input_epi:              true
-    input_epi_dim:          4
-    output_dim:             1
+    # input_feature_dim:      4
+    # input_feature_times:    3
+    output_dim:             3
     sigmoid:                false
     squeeze:                true
 
@@ -80,21 +80,13 @@ model:
     conv_dropout_rate:      0.2
     conv_padding:           same
     conv_activation:        relu
-    pool_kernel_size_list:  [1,2,2,2,2,1]
+    pool_kernel_size_list:  [2,2,2,2,2,2]
     gap:                    false
 
-    num_trans_blocks:       6
-    trans_d_embed:          256
-    trans_n_heads:          4
-    trans_d_mlp:            1024
-    trans_dropout_rate:     0.1
-
-    trans_add_cls:          true
-    trans_output:           cls
-    trans_token_type_embedding: true
 
     linear_channels_list:   [1024]
     linear_dropout_rate:    0.5
+
 
 
 optimizer:

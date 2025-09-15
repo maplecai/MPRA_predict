@@ -15,12 +15,12 @@ batch_size: 4096
 load_saved_model: false
 
 cell_types: &cell_types [K562, HepG2, SK-N-SH]
-assays: &assays [DNase, H3K4me3, H3K27ac, CTCF]
+assays: &assays [DNase, H3K4me3, H3K27ac]
 
 template_dataset:
   type: &type SeqFeatureMatrixDataset
   args: &args
-    data_path: ./data/Gosai_MPRA/Gosai_MPRA_Sei_feature_0529_norm.csv
+    data_path: ./data/Gosai_MPRA/Gosai_MPRA_seq_feature_alphagenome_log1p_zscore.csv
     seq_column: seq
     label_column: *cell_types
     cell_types: *cell_types
@@ -57,7 +57,6 @@ total_dataset:
   type: *type
   args:
     <<: *args
-    label_column: ['K562', 'HepG2', 'SK-N-SH', 'HCT116', 'A549']
     cell_types: ['K562', 'HepG2', 'SK-N-SH', 'HCT116', 'A549']
 
 model:
@@ -66,7 +65,7 @@ model:
     input_seq_length:       200
     input_seq_channels:     4
     input_epi:              true
-    input_epi_dim:          4
+    input_epi_dim:          3
     output_dim:             1
     sigmoid:                false
     squeeze:                true
@@ -80,7 +79,7 @@ model:
     conv_dropout_rate:      0.2
     conv_padding:           same
     conv_activation:        relu
-    pool_kernel_size_list:  [1,2,2,2,2,1]
+    pool_kernel_size_list:  [2,2,2,2,2,2]
     gap:                    false
 
     num_trans_blocks:       6
